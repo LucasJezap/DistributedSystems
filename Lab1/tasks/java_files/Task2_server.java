@@ -7,20 +7,19 @@ import java.util.Arrays;
 @SuppressWarnings("all")
 public class Task2_server {
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("JAVA UDP SERVER");
         DatagramSocket socket = null;
         int portNumber = 9009;
 
-        try{
+        try {
             socket = new DatagramSocket(portNumber);
             byte[] sendBuffer = "Java Server says: Żółta Gęś!".getBytes();
             byte[] receiveBuffer = new byte[1024];
 
-            while(true) {
+            while (true) {
                 // receive
-                Arrays.fill(receiveBuffer, (byte)0);
+                Arrays.fill(receiveBuffer, (byte) 0);
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 socket.receive(receivePacket);
                 String msg = new String(receivePacket.getData(), "UTF-8");
@@ -30,11 +29,9 @@ public class Task2_server {
                         receivePacket.getAddress(), receivePacket.getPort());
                 socket.send(sendPacket);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (socket != null) {
                 socket.close();
             }

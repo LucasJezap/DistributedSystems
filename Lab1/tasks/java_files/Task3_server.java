@@ -9,34 +9,31 @@ import java.util.Arrays;
 @SuppressWarnings("all")
 public class Task3_server {
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         System.out.println("JAVA UDP SERVER");
         DatagramSocket socket = null;
         int portNumber = 9010;
 
-        try{
+        try {
             socket = new DatagramSocket(portNumber);
             byte[] receiveBuffer = new byte[1024];
 
-            while(true) {
+            while (true) {
                 // receive
-                Arrays.fill(receiveBuffer, (byte)0);
+                Arrays.fill(receiveBuffer, (byte) 0);
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
                 socket.receive(receivePacket);
                 Integer msg = ByteBuffer.wrap(receivePacket.getData()).order(ByteOrder.LITTLE_ENDIAN).getInt();
                 System.out.println("received msg: " + msg);
                 // send
-                byte[] sendBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(msg+1).array();
+                byte[] sendBuffer = ByteBuffer.allocate(4).order(ByteOrder.LITTLE_ENDIAN).putInt(msg + 1).array();
                 DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length,
                         receivePacket.getAddress(), receivePacket.getPort());
                 socket.send(sendPacket);
             }
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (socket != null) {
                 socket.close();
             }

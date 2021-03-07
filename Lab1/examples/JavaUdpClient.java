@@ -4,8 +4,7 @@ import java.net.InetAddress;
 
 public class JavaUdpClient {
 
-    public static void main(String args[]) throws Exception
-    {
+    public static void main(String args[]) throws Exception {
         System.out.println("JAVA UDP CLIENT");
         DatagramSocket socket = null;
         int portNumber = 9008;
@@ -17,11 +16,9 @@ public class JavaUdpClient {
 
             DatagramPacket sendPacket = new DatagramPacket(sendBuffer, sendBuffer.length, address, portNumber);
             socket.send(sendPacket);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally {
+        } finally {
             if (socket != null) {
                 socket.close();
             }

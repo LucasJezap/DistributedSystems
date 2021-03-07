@@ -29,7 +29,7 @@ public class JavaTcpClient {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (socket != null){
+            if (socket != null) {
                 socket.close();
             }
         }

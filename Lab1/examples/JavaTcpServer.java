@@ -17,7 +17,7 @@ public class JavaTcpServer {
             // create socket
             serverSocket = new ServerSocket(portNumber);
 
-            while(true){
+            while (true) {
 
                 // accept client
                 Socket clientSocket = serverSocket.accept();
@@ -35,9 +35,8 @@ public class JavaTcpServer {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally{
-            if (serverSocket != null){
+        } finally {
+            if (serverSocket != null) {
                 serverSocket.close();
             }
         }
