@@ -21,5 +21,6 @@ public class ClientReadMessage implements Runnable {
             }
         }
         System.out.println("The read thread has been closed.");
+        ChatClient.threadsStopped = true;
     }
 }

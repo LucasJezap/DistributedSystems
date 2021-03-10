@@ -49,7 +49,8 @@ class ClientThread implements Runnable {
                 }
 
                 for (ClientThread client : ChatServer.clients) {
-                    client.dos.writeUTF(nickname + ": " + messageReceived);
+                    if (!client.nickname.equals(nickname))
+                        client.dos.writeUTF(nickname + ": " + messageReceived);
                 }
 
             } catch (IOException e) {

@@ -4,11 +4,12 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ClientSendMessage implements Runnable {
-    Scanner scanner;
+    Scanner scanner = new Scanner(System.in);
     DataOutputStream dos;
+    String nickname;
 
-    public ClientSendMessage(Scanner scanner, DataOutputStream dos) {
-        this.scanner = scanner;
+    public ClientSendMessage(DataOutputStream dos, String nickname) {
+        this.nickname = nickname;
         this.dos = dos;
     }
 
@@ -16,6 +17,7 @@ public class ClientSendMessage implements Runnable {
     public void run() {
         while (true) {
             try {
+                System.out.print(nickname + ": ");
                 String msg = scanner.nextLine();
                 dos.writeUTF(msg);
                 if (msg.equals("exit") || msg.equals("logout")) {
