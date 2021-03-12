@@ -15,6 +15,7 @@
       <sourceFolder url="file://$MODULE_DIR$/task4" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/homework" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/tasks" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/home_task" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="15" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
