@@ -20,7 +20,6 @@ class ChatClient extends Thread {
     ClientReadMessage clientReadMessage;
 
 
-
     ChatClient(String nickname) {
         this.nickname = nickname;
         this.clientUdpThread = new ClientUdpThread(host, port, this);

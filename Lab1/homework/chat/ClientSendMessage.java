@@ -25,7 +25,7 @@ class ClientSendMessage extends Thread {
     @Override
     public void run() {
         System.out.println("TCP send thread: UP\n");
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             System.out.print(chatClient.getNickname() + ": ");
             String message = null;
 

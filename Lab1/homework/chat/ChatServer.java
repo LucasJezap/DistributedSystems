@@ -1,6 +1,7 @@
 package chat;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.util.Vector;
 
@@ -21,10 +22,20 @@ public class ChatServer {
         System.out.println("UDP channel: UP\n\nWaiting for clients...\n");
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-
+            for (ClientThread ct : clients) {
+                try {
+                    PrintWriter pw = null;
+                    pw = new PrintWriter(ct.getClientSocket().getOutputStream(), true);
+                    pw.println("---CLOSE---");
+                    System.out.println("Client " + ct.nickname + " has disconnected from the server.");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            System.out.println("\nThe server has been closed.");
         }));
 
-        while (true) {
+        while (!Thread.currentThread().isInterrupted()) {
             ClientThread connectedClient = new ClientThread(serverSocket.accept());
             clients.add(connectedClient);
             connectedClient.start();

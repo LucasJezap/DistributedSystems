@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.net.SocketException;
 
 class ClientThread extends Thread {
-    private String nickname;
+    String nickname;
     private final Socket clientSocket;
 
     public ClientThread(Socket clientSocket) {
@@ -31,7 +31,7 @@ class ClientThread extends Thread {
             } else
                 ChatServer.nicknames.add(nickname);
 
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 String message;
                 try {
                     message = br.readLine();

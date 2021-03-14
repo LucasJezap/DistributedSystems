@@ -22,8 +22,8 @@ class ClientReadMessage extends Thread {
             while (chatClient.isOnline()) {
                 if (br.ready()) {
                     String message = br.readLine();
-                    if (message.length() > 20) {
-                        break;
+                    if (message.equals("---CLOSE---")) {
+                        System.exit(1);
                     }
                     System.out.print('\r' + message + "\n" + chatClient.getNickname() + ": ");
                 }

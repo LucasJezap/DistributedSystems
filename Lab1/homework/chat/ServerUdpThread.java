@@ -23,16 +23,16 @@ public class ServerUdpThread extends Thread {
             socket = new DatagramSocket(port);
             byte[] receiveBuffer = new byte[1024];
 
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 Arrays.fill(receiveBuffer, (byte) 0);
                 DatagramPacket receivePacket = new DatagramPacket(receiveBuffer, receiveBuffer.length);
 
                 socket.receive(receivePacket);
-                String msg = new String(receivePacket.getData());
+                String msg = new String(receivePacket.getData()).trim();
 
-                if (msg.substring(0, receivePacket.getLength()).equals("---STARTUDP---")){
+                if (msg.substring(0, receivePacket.getLength()).equals("---STARTUDP---")) {
                     clientAddressList.add(receivePacket.getSocketAddress());
-                } else{
+                } else {
                     System.out.println(msg);
 
                     for (SocketAddress csa : clientAddressList) {
