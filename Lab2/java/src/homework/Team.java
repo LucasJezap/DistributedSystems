@@ -1,61 +1,92 @@
 package homework;
 
-import com.rabbitmq.client.*;
-
-import javax.imageio.ImageIO;
-import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.concurrent.TimeoutException;
+import java.util.stream.Collectors;
 
-public class Team {
+class Team extends Thread {
+    private final String teamName;
+    BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    Scanner scanner = new Scanner(System.in);
+    Product[] orders;
+    TeamSendMessage teamSendMessage;
+    TeamReadMessage teamReadMessage;
+    int numberOfProducts;
+    volatile boolean readDone = true;
+    volatile boolean sendDone = true;
 
-    public static void main(String[] argv) throws Exception {
+    Team() throws IOException {
+        System.out.print("\nProvide your team name: ");
+        this.teamName = br.readLine();
+    }
 
-        // getting team name
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        welcomeTeam(br);
+    Team(String teamName) {
+        this.teamName = teamName;
+    }
 
-        // creating connection and channel
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        Connection connection = factory.newConnection();
-        Channel channel = connection.createChannel();
 
-        // routing key
-        System.out.print("Please provide routing key: ");
-        String routingKey = br.readLine();
+    @Override
+    public void run() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                teamReadMessage.interrupt();
+                teamSendMessage.interrupt();
+                Thread.sleep(10);
+                System.out.println("\n\nThe team thread is going to close.");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
 
-        // exchange
-        String EXCHANGE_NAME = "exchange1";
-        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT   );
+        try {
+            teamSendMessage = new TeamSendMessage(this, this.teamName);
+            teamReadMessage = new TeamReadMessage(this, this.teamName);
+            teamReadMessage.start();
+            teamSendMessage.start();
+        } catch (IOException | TimeoutException e) {
+            e.printStackTrace();
+        }
 
-        while (true) {
+        System.out.println("\nWelcome " + teamName);
+        System.out.println("The list of available products: " +
+                Arrays.stream(Product.values()).limit(Product.values().length - 1).collect(Collectors.toList()));
 
-            // read msg
-            System.out.print("Enter message: ");
-            String message = br.readLine();
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                System.out.print("""
 
-            // break condition
-            if ("exit".equals(message)) {
+                        Please type what you need to order (Don't worry about letter capitalization).
+                        You can order multiple products at once, e.g.,
+                        Oxygen Oxygen Backpack Boots
+                        Your order:\s""");
+                orders = Arrays.stream(scanner.nextLine().split(" ")).
+                        map(String::toUpperCase).
+                        map(Product::getProduct).
+                        toArray(Product[]::new);
+                numberOfProducts = orders.length;
+                sendDone = false;
+                readDone = false;
+                while (!sendDone || !readDone) {
+                    Thread.onSpinWait();
+                }
+            } catch (Exception e) {
                 break;
             }
 
-            // publish
-            channel.basicPublish(EXCHANGE_NAME, routingKey, null, message.getBytes(StandardCharsets.UTF_8));
-            System.out.println("Sent: " + message);
         }
-
-        channel.close();
-        connection.close();
     }
 
-    private static void welcomeTeam(BufferedReader br) throws IOException {
-        System.out.print("Provide your team name: ");
-        String teamName = br.readLine();
-        System.out.println("Welcome " + teamName);
+    public static void main(String[] argv) throws Exception {
+        Team newTeam;
+        if (argv.length == 0)
+            newTeam = new Team();
+        else
+            newTeam = new Team(argv[0]);
+        newTeam.start();
     }
+
 }

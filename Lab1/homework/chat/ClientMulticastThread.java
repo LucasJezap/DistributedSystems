@@ -37,9 +37,9 @@ class ClientMulticastThread extends Thread {
                 String msg = new String(packet.getData(), 0, packet.getLength());
                 System.out.print('\r' + msg + '\n' + client.getNickname() + ": ");
             }
-        } catch (IOException ioe) {
+        } catch (IOException e) {
             if (!socketToClose) {
-                ioe.printStackTrace();
+                e.printStackTrace();
             }
         }
     }
@@ -52,13 +52,14 @@ class ClientMulticastThread extends Thread {
             socket.leaveGroup(socketAddress, networkInterface);
             socket.send(packet);
             socket.joinGroup(socketAddress, networkInterface);
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     public void closeSocket() {
         socketToClose = true;
         socket.close();
+        System.out.println("Closing multicast thread...");
     }
 }

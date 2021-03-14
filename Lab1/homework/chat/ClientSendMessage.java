@@ -27,7 +27,13 @@ class ClientSendMessage extends Thread {
         System.out.println("TCP send thread: UP\n");
         while (true) {
             System.out.print(chatClient.getNickname() + ": ");
-            String message = scanner.nextLine();
+            String message = null;
+
+            try {
+                message = scanner.nextLine();
+            } catch (Exception e) {
+                break;
+            }
 
             if (message.equals("logout") || message.equals("exit")) {
                 chatClient.setOnline(false);
@@ -44,5 +50,6 @@ class ClientSendMessage extends Thread {
                 pw.println(message);
             }
         }
+        System.out.println("\n\nClosing sending thread...");
     }
 }

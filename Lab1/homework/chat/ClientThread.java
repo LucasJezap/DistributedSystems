@@ -19,14 +19,24 @@ class ClientThread extends Thread {
     public void run() {
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            PrintWriter pw = new PrintWriter(clientSocket.getOutputStream(), true);
 
             this.nickname = br.readLine();
             System.out.println("Client " + nickname + " has connected to the server.");
+
+            if (ChatServer.nicknames.contains(nickname)) {
+                for (String message : ChatServer.pastMessages) {
+                    pw.println(message);
+                }
+            } else
+                ChatServer.nicknames.add(nickname);
 
             while (true) {
                 String message;
                 try {
                     message = br.readLine();
+                    if (message != null)
+                        ChatServer.pastMessages.add(nickname + ": " + message);
                 } catch (SocketException e) {
                     closeSocket();
                     break;
@@ -51,7 +61,7 @@ class ClientThread extends Thread {
         }
     }
 
-    private void closeSocket() throws IOException {
+    public void closeSocket() throws IOException {
         clientSocket.close();
         ChatServer.clients.remove(this);
         System.out.println("Client " + nickname + " has disconnected from the server.");

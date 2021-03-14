@@ -11,11 +11,15 @@ class ChatClient extends Thread {
     private final String nickname;
     private boolean isOnline = false;
 
-    private final ClientUdpThread clientUdpThread;
-
     static final String multicastAddress = "225.225.225.225";
     static final int multicastPort = 1235;
+
+    final ClientUdpThread clientUdpThread;
     final ClientMulticastThread clientMulticastThread;
+    ClientSendMessage clientSendMessage;
+    ClientReadMessage clientReadMessage;
+
+
 
     ChatClient(String nickname) {
         this.nickname = nickname;
@@ -27,10 +31,20 @@ class ChatClient extends Thread {
     public void run() {
         isOnline = true;
 
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            try {
+                clientReadMessage.interrupt();
+                Thread.sleep(10);
+                System.out.println("Closing main thread...\nYou have been disconnected from the server");
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }));
+
         try {
             Socket serverSocket = new Socket(host, port);
-            ClientSendMessage clientSendMessage = new ClientSendMessage(serverSocket, this, clientUdpThread);
-            ClientReadMessage clientReadMessage = new ClientReadMessage(serverSocket, this);
+            clientSendMessage = new ClientSendMessage(serverSocket, this, clientUdpThread);
+            clientReadMessage = new ClientReadMessage(serverSocket, this);
 
             clientUdpThread.start();
             clientMulticastThread.start();
@@ -38,8 +52,8 @@ class ChatClient extends Thread {
             Thread.sleep(10);
             clientSendMessage.start();
 
-            clientSendMessage.join();
             clientReadMessage.join();
+            clientSendMessage.join();
 
             clientUdpThread.closeSocket();
             clientUdpThread.join();

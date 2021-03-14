@@ -43,6 +43,7 @@ class ClientUdpThread extends Thread {
                 e.printStackTrace();
             }
         }
+        System.out.println("Closing UDP thread...");
     }
 
     public void sendMessage(String message) {
