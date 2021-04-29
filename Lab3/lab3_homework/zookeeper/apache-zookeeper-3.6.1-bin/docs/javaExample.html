@@ -149,8 +149,8 @@ limitations under the License.
 <li><a href="#sc_design">Program Design</a></li>
 </ul>
 </li>
-<li><a href="#sc_executor">The Executor Class</a></li>
-<li><a href="#sc_DataMonitor">The DataMonitor Class</a></li>
+<li><a href="#sc_executor">The zoo.Executor Class</a></li>
+<li><a href="#sc_DataMonitor">The zoo.DataMonitor Class</a></li>
 <li><a href="#sc_completeSourceCode">Complete Source Listings</a></li>
 </ul>
 <p><a name="ch_Introduction"></a></p>
@@ -171,16 +171,16 @@ limitations under the License.
 </ul>
 <p><a name="sc_design"></a></p>
 <h3>Program Design</h3>
-<p>Conventionally, ZooKeeper applications are broken into two units, one which maintains the connection, and the other which monitors data.  In this application, the class called the <strong>Executor</strong> maintains the ZooKeeper connection, and the class called the <strong>DataMonitor</strong> monitors the data in the ZooKeeper tree. Also, Executor contains the main thread and contains the execution logic. It is responsible for what little user interaction there is, as well as interaction with the executable program you pass in as an argument and which the sample (per the requirements) shuts down and restarts, according to the state of the znode.</p>
+<p>Conventionally, ZooKeeper applications are broken into two units, one which maintains the connection, and the other which monitors data.  In this application, the class called the <strong>zoo.Executor</strong> maintains the ZooKeeper connection, and the class called the <strong>zoo.DataMonitor</strong> monitors the data in the ZooKeeper tree. Also, zoo.Executor contains the main thread and contains the execution logic. It is responsible for what little user interaction there is, as well as interaction with the executable program you pass in as an argument and which the sample (per the requirements) shuts down and restarts, according to the state of the znode.</p>
 <p><a name="sc_executor"></a></p>
-<h2>The Executor Class</h2>
-<p>The Executor object is the primary container of the sample application. It contains both the <strong>ZooKeeper</strong> object, <strong>DataMonitor</strong>, as described above in <a href="#sc_design">Program Design</a>.</p>
-<pre><code>// from the Executor class...
+<h2>The zoo.Executor Class</h2>
+<p>The zoo.Executor object is the primary container of the sample application. It contains both the <strong>ZooKeeper</strong> object, <strong>zoo.DataMonitor</strong>, as described above in <a href="#sc_design">Program Design</a>.</p>
+<pre><code>// from the zoo.Executor class...
 
 public static void main(String[] args) {
     if (args.length &lt; 4) {
         System.err
-                .println(&quot;USAGE: Executor hostPort znode filename program [args ...]&quot;);
+                .println(&quot;USAGE: zoo.Executor hostPort znode filename program [args ...]&quot;);
         System.exit(2);
     }
     String hostPort = args[0];
@@ -189,18 +189,18 @@ public static void main(String[] args) {
     String exec[] = new String[args.length - 3];
     System.arraycopy(args, 3, exec, 0, exec.length);
     try {
-        new Executor(hostPort, znode, filename, exec).run();
+        new zoo.Executor(hostPort, znode, filename, exec).run();
     } catch (Exception e) {
         e.printStackTrace();
     }
 }
 
-public Executor(String hostPort, String znode, String filename,
+public zoo.Executor(String hostPort, String znode, String filename,
         String exec[]) throws KeeperException, IOException {
     this.filename = filename;
     this.exec = exec;
     zk = new ZooKeeper(hostPort, 3000, this);
-    dm = new DataMonitor(zk, znode, null, this);
+    dm = new zoo.DataMonitor(zk, znode, null, this);
 }
 
 public void run() {
@@ -214,16 +214,16 @@ public void run() {
     }
 }
 </code></pre>
-<p>Recall that the Executor's job is to start and stop the executable whose name you pass in on the command line. It does this in response to events fired by the ZooKeeper object. As you can see in the code above, the Executor passes a reference to itself as the Watcher argument in the ZooKeeper constructor. It also passes a reference to itself as DataMonitorListener argument to the DataMonitor constructor. Per the Executor's definition, it implements both these interfaces:</p>
-<pre><code>public class Executor implements Watcher, Runnable, DataMonitor.DataMonitorListener {
+<p>Recall that the zoo.Executor's job is to start and stop the executable whose name you pass in on the command line. It does this in response to events fired by the ZooKeeper object. As you can see in the code above, the zoo.Executor passes a reference to itself as the Watcher argument in the ZooKeeper constructor. It also passes a reference to itself as DataMonitorListener argument to the zoo.DataMonitor constructor. Per the zoo.Executor's definition, it implements both these interfaces:</p>
+<pre><code>public class zoo.Executor implements Watcher, Runnable, zoo.DataMonitor.DataMonitorListener {
 ...
 </code></pre>
-<p>The <strong>Watcher</strong> interface is defined by the ZooKeeper Java API. ZooKeeper uses it to communicate back to its container. It supports only one method, <code>process()</code>, and ZooKeeper uses it to communicates generic events that the main thread would be interested in, such as the state of the ZooKeeper connection or the ZooKeeper session. The Executor in this example simply forwards those events down to the DataMonitor to decide what to do with them. It does this simply to illustrate the point that, by convention, the Executor or some Executor-like object &quot;owns&quot; the ZooKeeper connection, but it is free to delegate the events to other events to other objects. It also uses this as the default channel on which to fire watch events. (More on this later.)</p>
+<p>The <strong>Watcher</strong> interface is defined by the ZooKeeper Java API. ZooKeeper uses it to communicate back to its container. It supports only one method, <code>process()</code>, and ZooKeeper uses it to communicates generic events that the main thread would be interested in, such as the state of the ZooKeeper connection or the ZooKeeper session. The zoo.Executor in this example simply forwards those events down to the zoo.DataMonitor to decide what to do with them. It does this simply to illustrate the point that, by convention, the zoo.Executor or some zoo.Executor-like object &quot;owns&quot; the ZooKeeper connection, but it is free to delegate the events to other events to other objects. It also uses this as the default channel on which to fire watch events. (More on this later.)</p>
 <pre><code>public void process(WatchedEvent event) {
     dm.process(event);
 }
 </code></pre>
-<p>The <strong>DataMonitorListener</strong> interface, on the other hand, is not part of the ZooKeeper API. It is a completely custom interface, designed for this sample application. The DataMonitor object uses it to communicate back to its container, which is also the Executor object. The DataMonitorListener interface looks like this:</p>
+<p>The <strong>DataMonitorListener</strong> interface, on the other hand, is not part of the ZooKeeper API. It is a completely custom interface, designed for this sample application. The zoo.DataMonitor object uses it to communicate back to its container, which is also the zoo.Executor object. The DataMonitorListener interface looks like this:</p>
 <pre><code>public interface DataMonitorListener {
     /**
     * The existence status of the node has changed.
@@ -239,10 +239,10 @@ public void run() {
     void closing(int rc);
 }
 </code></pre>
-<p>This interface is defined in the DataMonitor class and implemented in the Executor class. When <code>Executor.exists()</code> is invoked, the Executor decides whether to start up or shut down per the requirements. Recall that the requires say to kill the executable when the znode ceases to <em>exist</em>.</p>
-<p>When <code>Executor.closing()</code> is invoked, the Executor decides whether or not to shut itself down in response to the ZooKeeper connection permanently disappearing.</p>
-<p>As you might have guessed, DataMonitor is the object that invokes these methods, in response to changes in ZooKeeper's state.</p>
-<p>Here are Executor's implementation of <code>DataMonitorListener.exists()</code> and <code>DataMonitorListener.closing</code>:</p>
+<p>This interface is defined in the zoo.DataMonitor class and implemented in the zoo.Executor class. When <code>zoo.Executor.exists()</code> is invoked, the zoo.Executor decides whether to start up or shut down per the requirements. Recall that the requires say to kill the executable when the znode ceases to <em>exist</em>.</p>
+<p>When <code>zoo.Executor.closing()</code> is invoked, the zoo.Executor decides whether or not to shut itself down in response to the ZooKeeper connection permanently disappearing.</p>
+<p>As you might have guessed, zoo.DataMonitor is the object that invokes these methods, in response to changes in ZooKeeper's state.</p>
+<p>Here are zoo.Executor's implementation of <code>DataMonitorListener.exists()</code> and <code>DataMonitorListener.closing</code>:</p>
 <pre><code>public void exists( byte[] data ) {
     if (data == null) {
         if (child != null) {
@@ -289,9 +289,9 @@ public void closing(int rc) {
 }
 </code></pre>
 <p><a name="sc_DataMonitor"></a></p>
-<h2>The DataMonitor Class</h2>
-<p>The DataMonitor class has the meat of the ZooKeeper logic. It is mostly asynchronous and event driven. DataMonitor kicks things off in the constructor with:</p>
-<pre><code>public DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher,
+<h2>The zoo.DataMonitor Class</h2>
+<p>The zoo.DataMonitor class has the meat of the ZooKeeper logic. It is mostly asynchronous and event driven. zoo.DataMonitor kicks things off in the constructor with:</p>
+<pre><code>public zoo.DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher,
         DataMonitorListener listener) {
     this.zk = zk;
     this.znode = znode;
@@ -304,9 +304,9 @@ public void closing(int rc) {
 <p>The call to <code>ZooKeeper.exists()</code> checks for the existence of the znode, sets a watch, and passes a reference to itself (<code>this</code>) as the completion callback object. In this sense, it kicks things off, since the real processing happens when the watch is triggered.</p>
 <h6>Note</h6>
 <blockquote>
-<p>Don't confuse the completion callback with the watch callback. The <code>ZooKeeper.exists()</code> completion callback, which happens to be the method <code>StatCallback.processResult()</code> implemented in the DataMonitor object, is invoked when the asynchronous <em>setting of the watch</em> operation (by <code>ZooKeeper.exists()</code>) completes on the server.</p>
-<p>The triggering of the watch, on the other hand, sends an event to the <em>Executor</em> object, since the Executor registered as the Watcher of the ZooKeeper object.</p>
-<p>As an aside, you might note that the DataMonitor could also register itself as the Watcher for this particular watch event. This is new to ZooKeeper 3.0.0 (the support of multiple Watchers). In this example, however, DataMonitor does not register as the Watcher.</p>
+<p>Don't confuse the completion callback with the watch callback. The <code>ZooKeeper.exists()</code> completion callback, which happens to be the method <code>StatCallback.processResult()</code> implemented in the zoo.DataMonitor object, is invoked when the asynchronous <em>setting of the watch</em> operation (by <code>ZooKeeper.exists()</code>) completes on the server.</p>
+<p>The triggering of the watch, on the other hand, sends an event to the <em>zoo.Executor</em> object, since the zoo.Executor registered as the Watcher of the ZooKeeper object.</p>
+<p>As an aside, you might note that the zoo.DataMonitor could also register itself as the Watcher for this particular watch event. This is new to ZooKeeper 3.0.0 (the support of multiple Watchers). In this example, however, zoo.DataMonitor does not register as the Watcher.</p>
 </blockquote>
 <p>When the <code>ZooKeeper.exists()</code> operation completes on the server, the ZooKeeper API invokes this completion callback on the client:</p>
 <pre><code>public void processResult(int rc, String path, Object ctx, Stat stat) {
@@ -348,8 +348,8 @@ public void closing(int rc) {
     }
 }
 </code></pre>
-<p>The code first checks the error codes for znode existence, fatal errors, and recoverable errors. If the file (or znode) exists, it gets the data from the znode, and then invoke the exists() callback of Executor if the state has changed. Note, it doesn't have to do any Exception processing for the getData call because it has watches pending for anything that could cause an error: if the node is deleted before it calls <code>ZooKeeper.getData()</code>, the watch event set by the <code>ZooKeeper.exists()</code> triggers a callback; if there is a communication error, a connection watch event fires when the connection comes back up.</p>
-<p>Finally, notice how DataMonitor processes watch events:</p>
+<p>The code first checks the error codes for znode existence, fatal errors, and recoverable errors. If the file (or znode) exists, it gets the data from the znode, and then invoke the exists() callback of zoo.Executor if the state has changed. Note, it doesn't have to do any Exception processing for the getData call because it has watches pending for anything that could cause an error: if the node is deleted before it calls <code>ZooKeeper.getData()</code>, the watch event set by the <code>ZooKeeper.exists()</code> triggers a callback; if there is a communication error, a connection watch event fires when the connection comes back up.</p>
+<p>Finally, notice how zoo.DataMonitor processes watch events:</p>
 <pre><code>public void process(WatchedEvent event) {
     String path = event.getPath();
     if (event.getType() == Event.EventType.None) {
@@ -379,12 +379,12 @@ public void closing(int rc) {
     }
 }
 </code></pre>
-<p>If the client-side ZooKeeper libraries can re-establish the communication channel (SyncConnected event) to ZooKeeper before session expiration (Expired event) all of the session's watches will automatically be re-established with the server (auto-reset of watches is new in ZooKeeper 3.0.0). See <a href="zookeeperProgrammers.html#ch_zkWatches">ZooKeeper Watches</a> in the programmer guide for more on this. A bit lower down in this function, when DataMonitor gets an event for a znode, it calls<code>ZooKeeper.exists()</code> to find out what has changed.</p>
+<p>If the client-side ZooKeeper libraries can re-establish the communication channel (SyncConnected event) to ZooKeeper before session expiration (Expired event) all of the session's watches will automatically be re-established with the server (auto-reset of watches is new in ZooKeeper 3.0.0). See <a href="zookeeperProgrammers.html#ch_zkWatches">ZooKeeper Watches</a> in the programmer guide for more on this. A bit lower down in this function, when zoo.DataMonitor gets an event for a znode, it calls<code>ZooKeeper.exists()</code> to find out what has changed.</p>
 <p><a name="sc_completeSourceCode"></a></p>
 <h2>Complete Source Listings</h2>
-<h3>Executor.java</h3>
+<h3>zoo.Executor.java</h3>
 <pre><code>/**
- * A simple example program to use DataMonitor to start and
+ * A simple example program to use zoo.DataMonitor to start and
  * stop executables based on a znode. The program watches the
  * specified znode and saves the data that corresponds to the
  * znode in the filesystem. It also starts the specified program
@@ -401,22 +401,22 @@ import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
 import org.apache.zookeeper.ZooKeeper;
 
-public class Executor
-    implements Watcher, Runnable, DataMonitor.DataMonitorListener
+public class zoo.Executor
+    implements Watcher, Runnable, zoo.DataMonitor.DataMonitorListener
 {
     String znode;
-    DataMonitor dm;
+    zoo.DataMonitor dm;
     ZooKeeper zk;
     String filename;
     String exec[];
     Process child;
 
-    public Executor(String hostPort, String znode, String filename,
+    public zoo.Executor(String hostPort, String znode, String filename,
             String exec[]) throws KeeperException, IOException {
         this.filename = filename;
         this.exec = exec;
         zk = new ZooKeeper(hostPort, 3000, this);
-        dm = new DataMonitor(zk, znode, null, this);
+        dm = new zoo.DataMonitor(zk, znode, null, this);
     }
 
     /**
@@ -425,7 +425,7 @@ public class Executor
     public static void main(String[] args) {
         if (args.length &lt; 4) {
             System.err
-                    .println(&quot;USAGE: Executor hostPort znode filename program [args ...]&quot;);
+                    .println(&quot;USAGE: zoo.Executor hostPort znode filename program [args ...]&quot;);
             System.exit(2);
         }
         String hostPort = args[0];
@@ -434,7 +434,7 @@ public class Executor
         String exec[] = new String[args.length - 3];
         System.arraycopy(args, 3, exec, 0, exec.length);
         try {
-            new Executor(hostPort, znode, filename, exec).run();
+            new zoo.Executor(hostPort, znode, filename, exec).run();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -530,7 +530,7 @@ public class Executor
     }
 }
 </code></pre>
-<h3>DataMonitor.java</h3>
+<h3>zoo.DataMonitor.java</h3>
 <pre><code>/**
  * A simple class that monitors the data and existence of a ZooKeeper
  * node. It uses asynchronous ZooKeeper APIs.
@@ -545,7 +545,7 @@ import org.apache.zookeeper.AsyncCallback.StatCallback;
 import org.apache.zookeeper.KeeperException.Code;
 import org.apache.zookeeper.data.Stat;
 
-public class DataMonitor implements Watcher, StatCallback {
+public class zoo.DataMonitor implements Watcher, StatCallback {
 
     ZooKeeper zk;
     String znode;
@@ -554,7 +554,7 @@ public class DataMonitor implements Watcher, StatCallback {
     DataMonitorListener listener;
     byte prevData[];
 
-    public DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher,
+    public zoo.DataMonitor(ZooKeeper zk, String znode, Watcher chainedWatcher,
             DataMonitorListener listener) {
         this.zk = zk;
         this.znode = znode;
@@ -566,7 +566,7 @@ public class DataMonitor implements Watcher, StatCallback {
     }
 
     /**
-     * Other classes use the DataMonitor by implementing this method
+     * Other classes use the zoo.DataMonitor by implementing this method
      */
     public interface DataMonitorListener {
         /**
