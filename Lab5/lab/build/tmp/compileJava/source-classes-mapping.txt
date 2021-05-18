@@ -1,0 +1,6 @@
+com/example/Lab5/HelloApplication.java
+ com.example.Lab5.HelloApplication
+com/example/Lab5/HelloResource.java
+ com.example.Lab5.HelloResource
+com/example/Lab5/HelloServlet.java
+ com.example.Lab5.HelloServlet
