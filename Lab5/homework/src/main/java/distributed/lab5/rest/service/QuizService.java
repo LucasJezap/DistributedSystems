@@ -84,7 +84,7 @@ public class QuizService {
         return gson.fromJson(question, Question.class);
     }
 
-    public String getQuiz(UrlList urlList) throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException, InterruptedException {
+    public String getQuiz(UrlList urlList) throws ClassNotFoundException, InterruptedException {
         StringBuilder html = new StringBuilder("<html>\n" + "<header><title>Trivia Quiz</title></header>\n" +
                 "<body>");
 

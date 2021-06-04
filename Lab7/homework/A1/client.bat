@@ -1,0 +1,1 @@
+cmd /k "C:\Users\Bossg\AppData\Local\Programs\Python\Python39\python.exe C:/Users/Bossg/Desktop/AGHSemestr6/SR/Lab7/homework/A1/client_python/crypto_client.py"

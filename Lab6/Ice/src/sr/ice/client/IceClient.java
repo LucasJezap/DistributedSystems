@@ -30,18 +30,15 @@ public class IceClient
 			// 1. Inicjalizacja ICE
 			communicator = Util.initialize(args);
 
-			// 2. Uzyskanie referencji obiektu na podstawie linii w pliku konfiguracyjnym (wï¿½wczas aplikacjï¿½ naleï¿½y uruchomiï¿½ z argumentem --Ice.config=config.client)
+			// 2. Uzyskanie referencji obiektu na podstawie linii w pliku konfiguracyjnym (wówczas aplikacjê nale¿y uruchomiæ z argumentem --Ice.config=config.client)
 			//ObjectPrx base1 = communicator.propertyToProxy("Calc1.Proxy");
 			
-			// 2. To samo co powyï¿½ej, ale mniej ï¿½adnie
-			ObjectPrx base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z wï¿½ï¿½cza mozliwoï¿½ï¿½ kompresji
-			ObjectPrx base2 = communicator.stringToProxy("calc/calc22:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z wï¿½ï¿½cza mozliwoï¿½ï¿½ kompresji
+			// 2. To samo co powy¿ej, ale mniej ³adnie
+			ObjectPrx base1 = communicator.stringToProxy("calc/calc11:tcp -h 127.0.0.2 -p 10000 -z : udp -h 127.0.0.2 -p 10000 -z"); //opcja -z w³¹cza mozliwoœæ kompresji
 
-
-			// 3. Rzutowanie, zawï¿½anie (do typu Calc)
+			// 3. Rzutowanie, zawê¿anie (do typu Calc)
 			CalcPrx obj1 = CalcPrx.checkedCast(base1);
-			CalcPrx obj2 = CalcPrx.checkedCast(base2);
-			if (obj1 == null || obj2 == null) throw new Error("Invalid proxy");
+			if (obj1 == null) throw new Error("Invalid proxy");
 			
 			CompletableFuture<Long> cfl = null;
 			String line = null;
@@ -90,7 +87,7 @@ public class IceClient
 						for(int i = 0; i < 10; i++) obj1.op(a, (short)44);
 						System.out.println("DONE");
 					}
-					else if (line.equals("add-with-ctx")) //wysï¿½anie dodatkowych danych stanowiï¿½cych kontekst wywoï¿½ania
+					else if (line.equals("add-with-ctx")) //wys³anie dodatkowych danych stanowi¹cych kontekst wywo³ania
 					{
 						Map<String,String> map = new HashMap<String, String>();
 						map.put("key1", "val1");
@@ -109,7 +106,7 @@ public class IceClient
 						System.out.println("Compression disabled");
 					} 
 
-					/* PONIï¿½EJ WYWOï¿½ANIA REALIZOWANE W TRYBIE ASYNCHRONICZNYM */
+					/* PONI¯EJ WYWO£ANIA REALIZOWANE W TRYBIE ASYNCHRONICZNYM */
 					
 					else if (line.equals("add-asyn1")) //future-based
 					{
@@ -119,7 +116,7 @@ public class IceClient
 							}
 						);
 					}
-					else if (line.equals("add-asyn2-req")) //future-based  1. zlecenie wywoï¿½ania
+					else if (line.equals("add-asyn2-req")) //future-based  1. zlecenie wywo³ania
 					{
 						cfl = obj1.addAsync(7000, 8000);						
 					}
@@ -128,7 +125,7 @@ public class IceClient
 						long r = cfl.join();						
 						System.out.println("RESULT = " + r);
 					}
-					else if (line.equals("op-asyn1a 100")) //co siï¿½ dzieje "w sieci"?
+					else if (line.equals("op-asyn1a 100")) //co siê dzieje "w sieci"?
 					{
 						A a = new A((short)11, 22, 33.0f, "ala ma kota");
 						for(int i = 0; i <100; i++) 
@@ -151,7 +148,7 @@ public class IceClient
 						System.out.println("DONE");
 					}
 					
-					/* PONIï¿½EJ USTAWIANIE TRYBY PRACY PROXY */
+					/* PONI¯EJ USTAWIANIE TRYBY PRACY PROXY */
 					
 					else if (line.equals("set-proxy twoway")) 
 					{
@@ -178,7 +175,7 @@ public class IceClient
 						obj1 = obj1.ice_batchDatagram();
 						System.out.println("obj1 proxy set to 'batch datagram' mode");
 					}
-					else if (line.equals("flush")) //sensowne tylko dla operacji wywoï¿½ywanych w trybie batch 
+					else if (line.equals("flush")) //sensowne tylko dla operacji wywo³ywanych w trybie batch 
 					{
 						obj1.ice_flushBatchRequests();
 						System.out.println("Flush DONE");
