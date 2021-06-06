@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "power";
+option java_outer_classname = "Power";
+
+package power;
+
+message PowerRequest {
+  float number = 1;
+}
+
+message PowerResponse {
+  float power = 1;
+}
+
+service PowerService {
+  rpc powerNumber(PowerRequest) returns(PowerResponse) {}
+}

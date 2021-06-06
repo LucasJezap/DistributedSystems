@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "square";
+option java_outer_classname = "Square";
+
+package square;
+
+message SquareRequest {
+  float number = 1;
+}
+
+message SquareResponse {
+  float square = 1;
+}
+
+service SquareService {
+  rpc squareNumber(SquareRequest) returns(SquareResponse) {}
+}

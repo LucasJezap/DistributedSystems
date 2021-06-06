@@ -1,0 +1,1 @@
+start cmd.exe /c "C:\Users\Bossg\Desktop\AGHSemestr6\SR\Lab7\homework\I3\csharp1\Client\Client\bin\Debug\net5.0\Client.exe"

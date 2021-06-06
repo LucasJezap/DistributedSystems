@@ -1,0 +1,3 @@
+cmd /k "protoc -I. --java_out=java/gen --plugin=protoc-gen-grpc-java-1.37.0-windows-x86_64.exe --grpc-java_out=java/gen java/src/main/proto/inverse.proto & exit"
+cmd /k "protoc -I. --java_out=java/gen --plugin=protoc-gen-grpc-java-1.37.0-windows-x86_64.exe --grpc-java_out=java/gen java/src/main/proto/power.proto & exit"
+cmd /k "protoc -I. --java_out=java/gen --plugin=protoc-gen-grpc-java-1.37.0-windows-x86_64.exe --grpc-java_out=java/gen java/src/main/proto/square.proto & exit"
