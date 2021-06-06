@@ -1,0 +1,1 @@
+cmd /k "slice2java --output-dir java/generated slice/calculator.ice & exit"

@@ -1,0 +1,1 @@
+cmd /k "cd nginx & nginx -s stop"
